@@ -90,6 +90,7 @@ def tree_trave(parentNode):
     tree_trave(parentNode.right)
 '''
 
+
 def calc(pnode):
     if isinstance(pnode.left,opNode):
         leftval=calc(pnode.left)
@@ -101,11 +102,72 @@ def calc(pnode):
     elif pnode.op == '+':
         return leftval + pnode.right.value
 
+class stack():
+    def __init__(self):
+        self.stk=[]
+        self.headpt=-1
+    def push(self,data):
+        self.stk.append(data)
+        self.headpt +=1
+    def pop(self):
+        self.headpt -= 1
+        return self.stk.pop()
+    def head(self):
+        return self.stk[self.headpt]
+    def is_empty(self):
+        return (1 if self.headpt == -1 else 0)
+
+def op_cmp(src,dst):
+    op_list={'+':1,'-':1,'*':2,'/':2}
+
+    pro_src=op_list[src]
+    pro_dst=op_list[dst]
+    if pro_src > pro_dst:
+        return 1
+    else:
+        return 0
+
+
+def token_revert(in_str):
+    data_stk=stack()
+    op_stk=stack()
+    for it in in_str:
+        if it.isdigit():
+            data_stk.push(it)
+        else:
+
+            if op_stk.is_empty():
+                op_stk.push(it)
+            else:
+                if op_cmp(it,op_stk.head()) == 1:
+                    op_stk.push(it)
+                else:
+                    data_stk.push(op_stk.pop())
+                    while op_stk.is_empty() == 0:
+                        if op_cmp(it,op_stk.head()) == 0:
+                            data_stk.push(op_stk.pop())
+                            if op_stk.is_empty():
+                                op_stk.push(it)
+                                break
+                        else:
+                            op_stk.push(it)
+                            break
+    if op_stk.is_empty() == 0:
+        return (data_stk.stk+op_stk.stk)
+    return data_stk.stk
+
+
+
+def cal_result(cnv_s):
+
+
 
 if __name__ == "__main__":
-    prin_str=token_process("1+2-1")
-    pnode=parser_token(prin_str)
+   # prin_str=token_process("4+4-7")
+    #pnode=parser_token(prin_str)
+    cnv_str=token_revert("1+2*3+1")
+    print(cnv_str)
     #print(pnode.op,pnode.left.op)
     #tree_trave(pnode)
-    print(calc(pnode))
+   # print(calc(pnode))
 
